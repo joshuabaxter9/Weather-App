@@ -42,9 +42,68 @@ const WeatherApp = () => {
     }
   };
 
+  const weatherImages = {
+    Clear: sunny,
+    Clouds: cloudy,
+    Rain: rainy,
+    Snow: snowy,
+    Haze: cloudy,
+    Mist: cloudy,
+  };
+
+  const weatherImage = data.weather
+    ? weatherImages[data.weather[0].main]
+    : null;
+
+  const backgroundImages = {
+    Clear: "linear-gradient(to right, #f3b07c, #fcd293)",
+    Clouds: "linear-gradient(to right, #57d6d4, #71eeec)",
+    Rain: "linear-gradient(to right, #5bc8fb, #80eaff)",
+    Snow: "linear-gradient(to right, #aff2ff, #fff)",
+    Haze: "linear-gradient(to right, #57d6d4, #71eeec)",
+    Mist: "linear-gradient(to right, #57d6d4, #71eeec)",
+  };
+
+  const backgroundImage = data.weather
+    ? backgroundImages[data.weather[0].main]
+    : "linear-gradient(to right, #f3b07c, #fcd293)";
+
+  const currentDate = new Date();
+
+  const daysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thu", "Fri", "Sat"];
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const dayOfWeek = daysOfWeek[currentDate.getDay()];
+  const month = months[currentDate.getMonth()];
+  const dayOfMonth = currentDate.getDate();
+
+  const formattedDate = `${dayOfWeek}, ${dayOfMonth} ${month}`;
+
   return (
-    <div className="container">
-      <div className="weather-app">
+    <div className="container" style={{ backgroundImage }}>
+      <div
+        className="weather-app"
+        style={{
+          backgroundImage:
+            backgroundImage && backgroundImage.replace
+              ? backgroundImage.replace("to right", "to top")
+              : null,
+        }}
+      >
         <div className="search">
           <div className="search-top">
             <i className="fa-solid fa-location-dot"></i>
@@ -62,7 +121,7 @@ const WeatherApp = () => {
           </div>
         </div>
         <div className="weather">
-          <img src={sunny} alt="sunny" />
+          <img src={weatherImage} alt="weather image" />
           <div className="weather-type">
             {data.weather ? data.weather[0].main : null}
           </div>
@@ -71,7 +130,7 @@ const WeatherApp = () => {
           </div>
         </div>
         <div className="weather-date">
-          <p>Sunday, August 11</p>
+          <p>{formattedDate}</p>
         </div>
         <div className="weather-data">
           <div className="humidity">
