@@ -2,20 +2,24 @@ import sunny from "../assets/sunny.png";
 import cloudy from "../assets/cloudy.png";
 import rainy from "../assets/rainy.png";
 import snowy from "../assets/snowy.png";
+import loadingGif from "../assets/loading.gif";
 import { useState, useEffect } from "react";
 
 const WeatherApp = () => {
   const [data, setData] = useState({});
   const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false);
   const api_key = "eb4dda514d8efca028bc36f5f347b151";
 
   useEffect(() => {
     const fetchDefaultWeather = async () => {
-      const defaultLocation = "New York";
+      setLoading(true);
+      const defaultLocation = "Boulder";
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${defaultLocation}&units=imperial&appid=${api_key}`;
       const res = await fetch(url);
       const defaultData = await res.json();
       setData(defaultData);
+      setLoading(false);
     };
 
     fetchDefaultWeather();
@@ -31,8 +35,13 @@ const WeatherApp = () => {
       const res = await fetch(url);
       const searchData = await res.json();
       console.log(searchData);
-      setData(searchData);
-      setLocation("");
+      if (searchData.cod !== 200) {
+        setData({ notFound: true });
+      } else {
+        setData(searchData);
+        setLocation("");
+      }
+      setLoading(false);
     }
   };
 
@@ -120,30 +129,42 @@ const WeatherApp = () => {
             <i className="fa-solid fa-magnifying-glass" onClick={search}></i>
           </div>
         </div>
-        <div className="weather">
-          <img src={weatherImage} alt="weather image" />
-          <div className="weather-type">
-            {data.weather ? data.weather[0].main : null}
-          </div>
-          <div className="temp">
-            {data.main ? `${Math.floor(data.main.temp)}°` : null}
-          </div>
-        </div>
-        <div className="weather-date">
-          <p>{formattedDate}</p>
-        </div>
-        <div className="weather-data">
-          <div className="humidity">
-            <div className="data-name">Humidity</div>
-            <i className="fa-solid fa-droplet"></i>
-            <div className="data">{data.main ? data.main.humidity : null}%</div>
-          </div>
-          <div className="wind">
-            <div className="data-name">Wind</div>
-            <i className="fa-solid fa-wind"></i>
-            <div className="data">{data.wind ? data.wind.speed : null} mph</div>
-          </div>
-        </div>
+        {loading ? (
+          <img className="loader" src={loadingGif} alt="loading" />
+        ) : data.notFound ? (
+          <div className="not-found">Not Found 😒</div>
+        ) : (
+          <>
+            <div className="weather">
+              <img src={weatherImage} alt="weather image" />
+              <div className="weather-type">
+                {data.weather ? data.weather[0].main : null}
+              </div>
+              <div className="temp">
+                {data.main ? `${Math.floor(data.main.temp)}°` : null}
+              </div>
+            </div>
+            <div className="weather-date">
+              <p>{formattedDate}</p>
+            </div>
+            <div className="weather-data">
+              <div className="humidity">
+                <div className="data-name">Humidity</div>
+                <i className="fa-solid fa-droplet"></i>
+                <div className="data">
+                  {data.main ? data.main.humidity : null}%
+                </div>
+              </div>
+              <div className="wind">
+                <div className="data-name">Wind</div>
+                <i className="fa-solid fa-wind"></i>
+                <div className="data">
+                  {data.wind ? data.wind.speed : null} mph
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
